@@ -1,0 +1,32 @@
+//@version=6
+indicator("10 & 20 EMA Crossover + VWAP", overlay=true)
+
+// User settings to enable/disable alerts and VWAP
+enableAlerts = input.bool(true, title="Enable Alerts?")
+showVWAP = input.bool(true, title="Show VWAP?")
+
+// Define EMAs
+shortEMA = ta.ema(close, 10)
+longEMA = ta.ema(close, 20)
+
+// VWAP Calculation
+vwap = ta.vwap(close)
+
+// Plot EMAs
+plot(shortEMA, color=color.green, title="10 EMA")
+plot(longEMA, color=color.red, title="20 EMA")
+
+// Plot VWAP if enabled
+plot(showVWAP ? vwap : na, color=color.rgb(236, 247, 94), linewidth=2, title="VWAP")
+
+// Identify Crossovers
+bullishCross = ta.crossover(shortEMA, longEMA)  // 10 EMA crosses above 20 EMA
+bearishCross = ta.crossunder(shortEMA, longEMA) // 10 EMA crosses below 20 EMA
+
+// Plot Crossover Signals
+plot(bullishCross ? shortEMA : na, style=plot.style_cross, linewidth=5, color=color.orange, title="Bullish Cross")
+plot(bearishCross ? shortEMA : na, style=plot.style_cross, linewidth=5, color=color.rgb(245, 29, 0), title="Bearish Cross")
+
+// Alerts (only trigger if enableAlerts is true)
+alertcondition(enableAlerts and bullishCross, title="Buy Signal", message="10 EMA crossed above 20 EMA! Consider a buy.")
+alertcondition(enableAlerts and bearishCross, title="Sell Signal", message="10 EMA crossed below 20 EMA! Consider a sell.") 
